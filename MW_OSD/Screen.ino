@@ -642,7 +642,8 @@ void displaypMeterSum(void)
     return;
   #ifdef BATICON4AMPHR
     if (Settings[S_SHOWBATLEVELEVOLUTION]){
-    battev=amperagesum/(360*Settings[S_AMPER_HOUR_ALARM]);
+    battev=pMeterSum > 0 ? pMeterSum : amperagesum/360;
+    battev=battev/Settings[S_AMPER_HOUR_ALARM];
     battev=constrain(battev,0,100);
     battev = map(100-battev, 0, 101, 0, 7);
     screenBuffer[0]=SYM_BATT_EMPTY-battev;
@@ -653,7 +654,7 @@ void displaypMeterSum(void)
   #endif
   {
   screenBuffer[0]=SYM_MAH;
-  int xx=amperagesum/360;
+  int xx=pMeterSum > 0 ? pMeterSum : amperagesum/360;
   itoa(xx,screenBuffer+1,10);
   }
 

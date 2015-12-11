@@ -185,6 +185,17 @@ void loop()
   digitalWrite(LEDPIN,LOW);
 }
 #else
+// ampAlarming returns true if the total consumed mAh is greater than
+// the configured alarm value (which is stored as 100s of amps)
+static bool ampAlarming() {
+    int used = pMeterSum > 0 ? pMeterSum : (amperagesum / 360);
+#ifdef BATICON4AMPHR    
+    return used > (Settings[S_AMPER_HOUR_ALARM]*80);
+#else
+    return used > (Settings[S_AMPER_HOUR_ALARM]*100);
+#endif
+    }
+
 
 //------------------------------------------------------------------------
 void loop()
@@ -409,12 +420,7 @@ void loop()
           displayRSSI();
         if(Settings[S_AMPERAGE]&&(((amperage/10)<Settings[S_AMPERAGE_ALARM])||(timer.Blink2hz))) 
           displayAmperage();
-#ifdef BATICON4AMPHR
-        if(Settings[S_AMPER_HOUR]&&((((amperagesum)/3600)<8*Settings[S_AMPER_HOUR_ALARM])||(timer.Blink2hz)))
-#else
-        if(Settings[S_AMPER_HOUR]&&((((amperagesum)/36000)<Settings[S_AMPER_HOUR_ALARM])||(timer.Blink2hz)))
-#endif        
-
+        if(Settings[S_AMPER_HOUR] && ((!ampAlarming()) || timer.Blink2hz))
           displaypMeterSum();
         displayTime();
 #ifdef TEMPSENSOR
